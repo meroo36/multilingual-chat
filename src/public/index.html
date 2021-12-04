@@ -2,17 +2,198 @@
 <html>
 
 <head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Page Title</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+    <title>Socket.IO chat</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
+    <style>
+        *:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        body {
+            margin: 0;
+            padding-bottom: 3rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        #form {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 0.25rem;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            height: 3rem;
+            box-sizing: border-box;
+            backdrop-filter: blur(10px);
+        }
+
+        #input {
+            border: none;
+            padding: 0 1rem;
+            flex-grow: 1;
+            border-radius: 2rem;
+            margin: 0.25rem;
+        }
+
+        #input:focus {
+            outline: none;
+        }
+
+        #form>button {
+            background: #333;
+            border: none;
+            padding: 0 1rem;
+            margin: 0.25rem;
+            border-radius: 3px;
+            outline: none;
+            color: #fff;
+        }
+
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #messages>li {
+            padding: 0.5rem 1rem;
+        }
+
+        #messages>li:nth-child(odd) {
+            background: #efefef;
+        }
+    </style>
 </head>
 
 <body>
-    asd
-    
-    <script src='index.js'></script>
+    <div class="main-wrapper">
+        <ul id="messages"></ul>
+        <form id="form" action=""><input id="input" autocomplete="off" /><button id="send-message">Send</button></form>
+    </div>
+    <div class="nickname-modal">
+        <div class="modal fade" id="roomModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <!-- <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Join a room</h5>
+                    </div> -->
+                    <form id="userNameForm" action="">
+                        <div class="modal-body" style="height: 35vh;">
+                            <ul class="nav nav-tabs">
+                                <li class="type-handler" data-type="joiner"><a class="nav-link active" data-toggle="tab"
+                                        href="#join" aria-selected="true" aria-controls="join">Join Room</a></li>
+                                <li class="type-handler" data-type="creator"><a class="nav-link" data-toggle="tab"
+                                        href="#create">Create
+                                        Room</a></li>
+                            </ul>
+                            <div class="tab-content pt-3 h-50">
+                                <div id="join" class="tab-pane fade in active show h-100">
+                                    <div class="row h-100">
+                                        <div class="col-md-6 text-center">
+                                            <h5>Room List</h5>
+                                            <small class="form-text text-muted">Select a room to join</small>
+                                            <select id="room-list" class="form-select w-100 h-100" size="3"
+                                                aria-label="size 3 select example">
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <form>
+                                                <div class="form-group">
+                                                    <label for="joiner-username">Username</label>
+                                                    <input type="text" class="form-control" id="joiner-username"
+                                                        placeholder="Enter you username">
+                                                </div>
+                                                <select id="joiner-language" class="form-control">
+                                                    <option>English</option>
+                                                    <option>German</option>
+                                                    <option>Turkish</option>
+                                                    <option>French</option>
+                                                </select>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="create" class="tab-pane fade">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="create-join-btn" class="btn btn-primary">Join Room</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+
+    <script src="public/index.js"></script>
+    <script>
+        $("#roomModal").modal({ backdrop: "static", keyboard: false });
+
+
+        $("#userNameForm").on("submit", function (event) {
+            event.preventDefault();
+            var userName = $("#userNameInput").val();
+            if (userName && userName.length > 0 && userName.length < 15) {
+                $("#nicknameModal").modal("hide");
+                var socket = io();
+                axios.get("/getOldMessages").then((response) => {
+                    response.data.forEach((obj) => {
+                        var item = document.createElement("li");
+                        item.textContent = obj.sender + ": " + obj.message;
+                        messages.appendChild(item);
+                        window.scrollTo(0, document.body.scrollHeight);
+                    });
+                });
+                var form = document.getElementById("form");
+                var input = document.getElementById("input");
+                socket.emit("send-nickname", userName);
+                socket.on("send-nickname", function (userName) {
+                    console.log("asdasdasd")
+                    var item = document.createElement("li");
+                    item.textContent = userName + " has joined the chat.";
+                    messages.appendChild(item);
+                    window.scrollTo(0, document.body.scrollHeight);
+                });
+                socket.on("chat message", function (msg, id) {
+                    var item = document.createElement("li");
+                    item.textContent = id + ": " + msg;
+                    messages.appendChild(item);
+                    window.scrollTo(0, document.body.scrollHeight);
+                });
+                socket.on("disconnected", function (id) {
+                    var item = document.createElement("li");
+                    item.textContent = id + " has left the chat.";
+                    messages.appendChild(item);
+                    window.scrollTo(0, document.body.scrollHeight);
+                });
+                form.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    if (input.value) {
+                        socket.emit("chat message", input.value, userName);
+                        input.value = "";
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
