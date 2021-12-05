@@ -17,9 +17,6 @@
         <div class="modal fade" id="roomModal" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
-                    <!-- <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Join a room</h5>
-                    </div> -->
                     <form id="userNameForm" action="">
                         <div class="modal-body" style="height: 35vh;">
                             <ul class="nav nav-tabs">
@@ -65,10 +62,10 @@
                                         <form>
                                             <div class="form-group">
                                                 <input type="text" class="form-control" id="creator-roomId"
-                                                    placeholder="Enter your room ID">
+                                                    placeholder="Enter your room name">
                                             </div>
                                             <div class="form-group">
-                                                <input type="text" class="form-control" id="joiner-username"
+                                                <input type="text" class="form-control" id="creator-username"
                                                     placeholder="Enter your username">
                                             </div>
                                             <select id="creator-language" class="form-control">
@@ -81,7 +78,7 @@
                                             <label for=""></label>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckDefault">
+                                                    id="onlyOwnerCanChat">
                                                 <label class="form-check-label">
                                                     Only room owner can chat
                                                 </label>
@@ -112,7 +109,7 @@
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
     <script src="public/index.js"></script>
-    
+
 </body>
 
 </html>

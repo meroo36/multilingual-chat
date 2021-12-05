@@ -5,9 +5,11 @@
     $("#roomModal").modal({ backdrop: "static", keyboard: false });
 
     socket.on("rooms:get", function (rooms) {
+        console.log("rooms:get");
         $("#room-list").empty();
         for (const [key, value] of Object.entries(rooms)) {
-            $("#room-list")[0].append(new Option(key, key));
+            console.log(value);
+            $("#room-list")[0].append(new Option(key, `${key}${value.only_owner_can_chat ? "-locked" : ""}`));
         }
     });
 
@@ -32,23 +34,24 @@
     $("#create-join-btn").on("click", function () {
         if (userType === "joiner") {
             //join a room
-            let username = $("#joiner-username").val();
-            let lang = $("#joiner-language").val();
-            let roomId = $("#room-list").val();
+            const username = $("#joiner-username").val();
+            const lang = $("#joiner-language").val();
+            const roomId = $("#room-list").val().split("-")[0];
+            const isLocked = $("#room-list").val().split("-")[1] === "locked" ? true : false;
+            if (isLocked) {
+                $("#input").val("Only room owner can chat.").attr("disabled", true);
+                $("#send-message").attr("disabled", true);
+            }
             userObj = {
                 username,
                 lang,
                 roomId,
             };
-            const User = {
-                lang,
-                username,
-            };
             if (username.length < 1) return;
             if (lang.length < 1) return;
             if (roomId.length < 1) return;
             $("#roomModal").modal("hide");
-            socket.emit("room:join", roomId, User);
+            socket.emit("room:join", roomId, userObj);
             socket.on("room:userJoined", function (username, messages) {
                 console.log(messages);
                 $("#messages").append($(`<li>${username} has joined the chat.</li>`));
@@ -58,32 +61,30 @@
                 $("#messages").append($(`<li>${username}: ${message}</li>`));
             });
         } else if (userType === "creator") {
-            //join a room
-            let username = $("#creator-username").val();
-            let lang = $("#creator-language").val();
-            let roomId = $("#room-list").val();
+            //create a room
+            const username = $("#creator-username").val();
+            const lang = $("#creator-language").val();
+            const roomId = $("#creator-roomId").val();
+            const onlyOwnerCanChat = $("#onlyOwnerCanChat").is(":checked");
             userObj = {
                 username,
                 lang,
                 roomId,
             };
-            const User = {
-                lang,
-                username,
-            };
             if (username.length < 1) return;
             if (lang.length < 1) return;
             if (roomId.length < 1) return;
-            $("#roomModal").modal("hide");
-            socket.emit("room:join", roomId, User);
-            socket.on("room:userJoined", function (username, messages) {
-                console.log(messages);
-                $("#messages").append($(`<li>${username} has joined the chat.</li>`));
-            });
+            socket.emit("room:create", roomId, userObj, onlyOwnerCanChat);
+
             socket.on("message:receive", function (username, message) {
                 console.log("message:receive", message);
                 $("#messages").append($(`<li>${username}: ${message}</li>`));
             });
+            socket.on("room:userJoined", function (username, messages) {
+                console.log(messages);
+                $("#messages").append($(`<li>${username} has joined the chat.</li>`));
+            });
+            $("#roomModal").modal("hide");
         }
     });
 })();
