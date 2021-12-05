@@ -4,6 +4,7 @@ import { sendMessage } from "./chatListener";
 import Rooms from "../model/rooms";
 import User from "../model/user";
 import Message from "../model/message";
+import http from "http";
 
 const rooms: Rooms = {
     global_room: {
@@ -15,7 +16,7 @@ const rooms: Rooms = {
     },
 };
 
-const attachSocketIo = (server: any) => {
+const attachSocketIo = (server: http.Server) => {
     const io = new Server(server);
     io.on("connection", (socket: Socket) => {
         socket.emit("rooms:get", rooms);

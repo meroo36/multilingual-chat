@@ -2,14 +2,16 @@ import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import http from "http";
 const app = express();
-export const server = http.createServer(app);
-import "./socket/index";
 import livereload from "livereload";
 import path from "path";
 import connectLivereload from "connect-livereload";
+import attachSocketIo from "./socket";
 
 app.use(connectLivereload());
 dotenv.config();
+
+const server = http.createServer(app);
+attachSocketIo(server);
 
 app.get("/", (req: Request, res: Response) => {
     res.sendFile(__dirname + "/public/index.html");
