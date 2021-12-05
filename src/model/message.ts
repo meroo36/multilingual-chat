@@ -1,5 +1,6 @@
 interface Message {
     username: string;
-    message: string;
+    text: string;
+    original_lang: string;
 }
 export default Message;
