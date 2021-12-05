@@ -21,13 +21,15 @@ const joinRoom = (config: { socket: Socket; roomId: string; user: User; rooms: R
         //add user to roomId for non-linguistic events
         socket.join(roomId);
 
-        socket.to(roomId).emit("room:userJoined", user.username, room.messages);
+        socket.broadcast.to(roomId).emit("room:userJoined", user.username, room.messages);
+        console.log(room);
     } else return;
 };
 
 const createRoom = (config: { socket: Socket; roomId: string; user: User; onlyOwnerCanChat: boolean; rooms: Rooms }) => {
     //initialize room
     const { socket, roomId, user, onlyOwnerCanChat, rooms } = config;
+    user.socket_id = socket.id;
     rooms[roomId] = {
         lang_list: [user.lang],
         only_owner_can_chat: onlyOwnerCanChat,
@@ -36,21 +38,24 @@ const createRoom = (config: { socket: Socket; roomId: string; user: User; onlyOw
         owner_socket_id: socket.id,
     };
     //send new room to client
-    socket.emit("rooms:get", rooms);
+    socket.broadcast.emit("rooms:get", rooms);
     socket.join(`${roomId}/${user.lang}`);
     //add user to roomId for non-linguistic events
     socket.join(roomId);
 };
 const leaveRoom = (socket: Socket, rooms: Rooms) => {
     const socketId = socket.id;
+    console.log("leave:room");
     for (const [key, value] of Object.entries(rooms)) {
         const userList = value.users;
         const index = userList.findIndex((element) => element.socket_id == socketId);
+        console.log(index);
         if (index > -1) {
             value.users.splice(index, 1);
             const roomIsEmptyAndNotGlobalRoom = value.users.length === 0 && key !== "global_room";
             if (roomIsEmptyAndNotGlobalRoom) {
                 delete rooms[key];
+                socket.broadcast.emit("rooms:get", rooms);
             }
         }
     }
