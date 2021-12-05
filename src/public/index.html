@@ -5,67 +5,7 @@
     <title>Socket.IO chat</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
         integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
-    <style>
-        *:focus {
-            outline: none;
-            box-shadow: none;
-        }
-
-        body {
-            margin: 0;
-            padding-bottom: 3rem;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        #form {
-            background: rgba(0, 0, 0, 0.15);
-            padding: 0.25rem;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            height: 3rem;
-            box-sizing: border-box;
-            backdrop-filter: blur(10px);
-        }
-
-        #input {
-            border: none;
-            padding: 0 1rem;
-            flex-grow: 1;
-            border-radius: 2rem;
-            margin: 0.25rem;
-        }
-
-        #input:focus {
-            outline: none;
-        }
-
-        #form>button {
-            background: #333;
-            border: none;
-            padding: 0 1rem;
-            margin: 0.25rem;
-            border-radius: 3px;
-            outline: none;
-            color: #fff;
-        }
-
-        #messages {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        #messages>li {
-            padding: 0.5rem 1rem;
-        }
-
-        #messages>li:nth-child(odd) {
-            background: #efefef;
-        }
-    </style>
+    <link rel="stylesheet" href="public/index.css">
 </head>
 
 <body>
@@ -95,29 +35,59 @@
                                         <div class="col-md-6 text-center">
                                             <h5>Room List</h5>
                                             <small class="form-text text-muted">Select a room to join</small>
-                                            <select id="room-list" class="form-select w-100 h-100" size="3"
+                                            <select style="border: 1.5px solid #c7c7c7; text-align:center"
+                                                id="room-list" class="form-select w-100 h-100" size="3"
                                                 aria-label="size 3 select example">
                                             </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <form>
-                                                <div class="form-group">
-                                                    <label for="joiner-username">Username</label>
-                                                    <input type="text" class="form-control" id="joiner-username"
-                                                        placeholder="Enter you username">
-                                                </div>
-                                                <select id="joiner-language" class="form-control">
-                                                    <option>English</option>
-                                                    <option>German</option>
-                                                    <option>Turkish</option>
-                                                    <option>French</option>
-                                                </select>
-                                            </form>
+                                            <div class="text-center">
+                                                <h5>User Info</h5>
+                                                <small class="form-text text-muted">Enter your username end
+                                                    language.</small>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" id="joiner-username"
+                                                    placeholder="Enter your username">
+                                            </div>
+                                            <select id="joiner-language" class="form-control">
+                                                <option value="EN">English</option>
+                                                <option value="FR">French</option>
+                                                <option value="DE">Deutsch - German</option>
+                                                <option value="ES">Español - Spanish</option>
+                                                <option value="JA">日本語 - Japanese</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                                 <div id="create" class="tab-pane fade">
-
+                                    <div class="">
+                                        <form>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" id="creator-roomId"
+                                                    placeholder="Enter your room ID">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" id="joiner-username"
+                                                    placeholder="Enter your username">
+                                            </div>
+                                            <select id="creator-language" class="form-control">
+                                                <option value="EN">English</option>
+                                                <option value="FR">French</option>
+                                                <option value="DE">Deutsch - German</option>
+                                                <option value="ES">Español - Spanish</option>
+                                                <option value="JA">日本語 - Japanese</option>
+                                            </select>
+                                            <label for=""></label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value=""
+                                                    id="flexCheckDefault">
+                                                <label class="form-check-label">
+                                                    Only room owner can chat
+                                                </label>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -132,7 +102,6 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
         integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
         crossorigin="anonymous"></script>
@@ -142,58 +111,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
-
     <script src="public/index.js"></script>
-    <script>
-        $("#roomModal").modal({ backdrop: "static", keyboard: false });
-
-
-        $("#userNameForm").on("submit", function (event) {
-            event.preventDefault();
-            var userName = $("#userNameInput").val();
-            if (userName && userName.length > 0 && userName.length < 15) {
-                $("#nicknameModal").modal("hide");
-                var socket = io();
-                axios.get("/getOldMessages").then((response) => {
-                    response.data.forEach((obj) => {
-                        var item = document.createElement("li");
-                        item.textContent = obj.sender + ": " + obj.message;
-                        messages.appendChild(item);
-                        window.scrollTo(0, document.body.scrollHeight);
-                    });
-                });
-                var form = document.getElementById("form");
-                var input = document.getElementById("input");
-                socket.emit("send-nickname", userName);
-                socket.on("send-nickname", function (userName) {
-                    console.log("asdasdasd")
-                    var item = document.createElement("li");
-                    item.textContent = userName + " has joined the chat.";
-                    messages.appendChild(item);
-                    window.scrollTo(0, document.body.scrollHeight);
-                });
-                socket.on("chat message", function (msg, id) {
-                    var item = document.createElement("li");
-                    item.textContent = id + ": " + msg;
-                    messages.appendChild(item);
-                    window.scrollTo(0, document.body.scrollHeight);
-                });
-                socket.on("disconnected", function (id) {
-                    var item = document.createElement("li");
-                    item.textContent = id + " has left the chat.";
-                    messages.appendChild(item);
-                    window.scrollTo(0, document.body.scrollHeight);
-                });
-                form.addEventListener("submit", function (e) {
-                    e.preventDefault();
-                    if (input.value) {
-                        socket.emit("chat message", input.value, userName);
-                        input.value = "";
-                    }
-                });
-            }
-        });
-    </script>
+    
 </body>
 
 </html>

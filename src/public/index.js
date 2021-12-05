@@ -2,6 +2,8 @@
     let socket = io();
     let userType = "joiner";
     let userObj = {};
+    $("#roomModal").modal({ backdrop: "static", keyboard: false });
+
     socket.on("rooms:get", function (rooms) {
         $("#room-list").empty();
         for (const [key, value] of Object.entries(rooms)) {
@@ -21,8 +23,10 @@
     $("#send-message").on("click", function (event) {
         event.preventDefault();
         let message = $("#input").val();
-        console.log(userObj.roomId);
-        socket.emit("message:send", userObj.roomId, userObj.username, message);
+        socket.emit("message:send", userObj.roomId, { text: message, username: userObj.username, original_lang: userObj.lang });
+        $("#input").val("");
+        $("#messages").append($(`<li>${userObj.username}: ${message}</li>`));
+        window.scrollTo(0, document.body.scrollHeight);
     });
 
     $("#create-join-btn").on("click", function () {
@@ -45,15 +49,41 @@
             if (roomId.length < 1) return;
             $("#roomModal").modal("hide");
             socket.emit("room:join", roomId, User);
-            socket.on("room:userJoined", function (username) {
-                $("#messages").append($(`<li>${username} has joined the chat room.</li>`));
+            socket.on("room:userJoined", function (username, messages) {
+                console.log(messages);
+                $("#messages").append($(`<li>${username} has joined the chat.</li>`));
             });
-            socket.on("message:recieve", function (username, message) {
-                console.log("message:recieve", message);
+            socket.on("message:receive", function (username, message) {
+                console.log("message:receive", message);
                 $("#messages").append($(`<li>${username}: ${message}</li>`));
             });
         } else if (userType === "creator") {
-            //create a room and join
+            //join a room
+            let username = $("#creator-username").val();
+            let lang = $("#creator-language").val();
+            let roomId = $("#room-list").val();
+            userObj = {
+                username,
+                lang,
+                roomId,
+            };
+            const User = {
+                lang,
+                username,
+            };
+            if (username.length < 1) return;
+            if (lang.length < 1) return;
+            if (roomId.length < 1) return;
+            $("#roomModal").modal("hide");
+            socket.emit("room:join", roomId, User);
+            socket.on("room:userJoined", function (username, messages) {
+                console.log(messages);
+                $("#messages").append($(`<li>${username} has joined the chat.</li>`));
+            });
+            socket.on("message:receive", function (username, message) {
+                console.log("message:receive", message);
+                $("#messages").append($(`<li>${username}: ${message}</li>`));
+            });
         }
     });
 })();
