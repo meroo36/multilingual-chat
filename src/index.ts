@@ -2,7 +2,6 @@ import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import http from "http";
 const app = express();
-import path from "path";
 import attachSocketIo from "./socket";
 
 dotenv.config();
