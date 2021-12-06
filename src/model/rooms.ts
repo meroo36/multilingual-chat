@@ -7,7 +7,6 @@ interface Rooms {
         lang_list: [string?];
         only_owner_can_chat: boolean;
         users: User[];
-        messages?: Message[];
     };
 }
 
