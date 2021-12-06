@@ -10,7 +10,6 @@ const rooms: Rooms = {
     global_room: {
         owner_socket_id: "999999",
         only_owner_can_chat: false,
-        messages: [],
         lang_list: [],
         users: [],
     },

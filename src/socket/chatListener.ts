@@ -6,12 +6,10 @@ import Rooms from "../model/rooms";
 const sendMessage = async (config: { socket: Socket; roomId: string; message: Message; rooms: Rooms }) => {
     const { socket, roomId, message, rooms } = config;
     const room = rooms[roomId];
-    console.log(message);
     if (room) {
         if (socket.id !== room.owner_socket_id && room.only_owner_can_chat) return;
         const langs = room.lang_list;
         for (const lang of langs) {
-            console.log(lang, message.original_lang);
             if (lang === message.original_lang) {
                 socket.to(`${roomId}/${lang}`).emit("message:receive", message.username, message.text);
             } else {
