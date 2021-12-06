@@ -7,7 +7,8 @@ const sendMessage = async (config: { socket: Socket; roomId: string; message: Me
     const { socket, roomId, message, rooms } = config;
     const room = rooms[roomId];
     if (room) {
-        if (socket.id !== room.owner_socket_id && room.only_owner_can_chat) return;
+        const isNotOwnerAndRoomIsOnlyOwnerChat = socket.id !== room.owner_socket_id && room.only_owner_can_chat;
+        if (isNotOwnerAndRoomIsOnlyOwnerChat) return;
         const langs = room.lang_list;
         for (const lang of langs) {
             if (lang === message.original_lang) {
