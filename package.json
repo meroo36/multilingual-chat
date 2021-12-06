@@ -6,7 +6,9 @@
     "scripts": {
         "start": "node dist/index.js",
         "dev": "nodemon src/index.ts",
-        "build": "tsc"
+        "build": "npm run clean && tsc && npm run copy-files",
+        "clean": "rm -rf ./dist",
+        "copy-files": "cp ./src/public/ ./dist/"
     },
     "repository": {
         "type": "git",
