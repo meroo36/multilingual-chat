@@ -20,6 +20,7 @@
     "homepage": "https://github.com/meroo36/multilingual-chat#readme",
     "dependencies": {
         "deepl": "^1.0.13",
+        "dotenv": "^10.0.0",
         "express": "^4.17.1",
         "livereload": "^0.9.3",
         "socket.io": "^4.4.0"
