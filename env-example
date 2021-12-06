@@ -1,0 +1,2 @@
+PORT=<server_port>
+DEEPL_API_KEY=<your_deepl_api_key>
