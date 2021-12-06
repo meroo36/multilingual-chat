@@ -1,15 +1,14 @@
 (function () {
+    $("#roomModal").modal({ backdrop: "static", keyboard: false });
+
     let socket = io();
     let userType = "joiner";
     let userObj = {};
-    $("#roomModal").modal({ backdrop: "static", keyboard: false });
 
     socket.on("rooms:get", function (rooms) {
-        console.log("rooms:get");
         $("#room-list").empty();
         for (const [key, value] of Object.entries(rooms)) {
-            console.log(value);
-            $("#room-list")[0].append(new Option(key, `${key}${value.only_owner_can_chat ? "-locked" : ""}`));
+            $("#room-list")[0].append(new Option(`${key}(${value.users.length})`, `${key}${value.only_owner_can_chat ? "-locked" : ""}`));
         }
     });
 
@@ -27,7 +26,10 @@
         let message = $("#input").val();
         socket.emit("message:send", userObj.roomId, { text: message, username: userObj.username, original_lang: userObj.lang });
         $("#input").val("");
-        $("#messages").append($(`<li>${userObj.username}: ${message}</li>`));
+        let createRGB = `rgb(${(userObj.username.charCodeAt(0) * 999) % 255}, ${(userObj.username.charCodeAt(1) * 999) % 255}, ${
+            (userObj.username.charCodeAt(2) * 999) % 255
+        })`;
+        $("#messages").append($(`<li><b style="color:${createRGB}">${userObj.username}</b>: ${message}</li>`));
         window.scrollTo(0, document.body.scrollHeight);
     });
 
@@ -52,14 +54,6 @@
             if (roomId.length < 1) return;
             $("#roomModal").modal("hide");
             socket.emit("room:join", roomId, userObj);
-            socket.on("room:userJoined", function (username, messages) {
-                console.log(messages);
-                $("#messages").append($(`<li>${username} has joined the chat.</li>`));
-            });
-            socket.on("message:receive", function (username, message) {
-                console.log("message:receive", message);
-                $("#messages").append($(`<li>${username}: ${message}</li>`));
-            });
         } else if (userType === "creator") {
             //create a room
             const username = $("#creator-username").val();
@@ -75,16 +69,25 @@
             if (lang.length < 1) return;
             if (roomId.length < 1) return;
             socket.emit("room:create", roomId, userObj, onlyOwnerCanChat);
-
-            socket.on("message:receive", function (username, message) {
-                console.log("message:receive", message);
-                $("#messages").append($(`<li>${username}: ${message}</li>`));
-            });
-            socket.on("room:userJoined", function (username, messages) {
-                console.log(messages);
-                $("#messages").append($(`<li>${username} has joined the chat.</li>`));
-            });
             $("#roomModal").modal("hide");
         }
+        socket.on("message:receive", function (username, message) {
+            let createRGB = `rgb(${(username.charCodeAt(0) * 999) % 255}, ${(username.charCodeAt(1) * 999) % 255}, ${
+                (username.charCodeAt(2) * 999) % 255
+            })`;
+            $("#messages").append($(`<li><b style="color:${createRGB}">${username}</b>: ${message}</li>`));
+        });
+        socket.on("room:userJoined", function (username) {
+            let createRGB = `rgb(${(username.charCodeAt(0) * 999) % 255}, ${(username.charCodeAt(1) * 999) % 255}, ${
+                (username.charCodeAt(2) * 999) % 255
+            })`;
+            $("#messages").append($(`<li><b style="color:${createRGB}">${username}</b> has joined the chat.</li>`));
+        });
+        socket.on("room:userLeft", function (username) {
+            let createRGB = `rgb(${(username.charCodeAt(0) * 999) % 255}, ${(username.charCodeAt(1) * 999) % 255}, ${
+                (username.charCodeAt(2) * 999) % 255
+            })`;
+            $("#messages").append($(`<li><b style="color:${createRGB}">${username}</b> has left the chat.</li>`));
+        });
     });
 })();
