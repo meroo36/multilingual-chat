@@ -7,8 +7,8 @@
         "start": "node dist/index.js",
         "dev": "nodemon src/index.ts",
         "postinstall": "tsc && npm run htmlcopy && npm run csscopy",
-        "htmlcopy": "copyfiles src/public/*.html dist/public",
-        "csscopy": "copyfiles src/public/*.css dist",
+        "htmlcopy": "copyfiles -f src/public/*.html dist/public",
+        "csscopy": "copyfiles -f src/public/*.css dist/public",
         "watch-ts": "tsc -w"
     },
     "repository": {
