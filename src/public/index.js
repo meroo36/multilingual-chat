@@ -20,6 +20,9 @@
             $("#create-join-btn").text("Create Room");
         }
     });
+    $(".leave-btn").on("click", function () {
+        location.reload();
+    });
 
     $("#send-message").on("click", function (event) {
         event.preventDefault();

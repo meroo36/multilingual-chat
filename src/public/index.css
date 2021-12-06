@@ -33,7 +33,12 @@ body {
 #input:focus {
     outline: none;
 }
-
+.leave-btn{
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 2px;
+}
 #form > button {
     background: #333;
     border: none;
