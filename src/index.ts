@@ -16,6 +16,7 @@ app.get("/", (req: Request, res: Response) => {
 
 if (process.env.NODE_ENV === "production") {
     app.get("/app/dist/public/*", (req: Request, res: Response) => {
+        console.log(__dirname + req.path);
         res.sendFile(__dirname + req.path);
     });
 } else {
